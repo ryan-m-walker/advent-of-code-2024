@@ -1,21 +1,14 @@
-use std::{mem, str::Chars, vec};
+use std::{str::Chars, vec};
 
 #[derive(Debug, Clone)]
 pub enum Node {
     Do,
     Dont,
-    Mul(Mul),
-}
-
-#[derive(Debug, Clone)]
-pub struct Mul {
-    pub left: i32,
-    pub right: i32,
+    Mul(i32, i32),
 }
 
 #[derive(Debug, Clone)]
 pub struct Parser<'a> {
-    ptr: usize,
     output: Vec<Node>,
     chars: Chars<'a>,
 }
@@ -23,23 +16,19 @@ pub struct Parser<'a> {
 impl<'a> Parser<'a> {
     pub fn new(src: &'a str) -> Self {
         Parser {
-            ptr: 0,
             output: vec![],
             chars: src.chars().to_owned(),
         }
     }
 
     pub fn parse(&mut self) -> Vec<Node> {
-        while let Some(c) = self.next() {
-            dbg!(c);
+        while let Some(c) = self.chars.next() {
             if c == 'm' {
-                dbg!("mul");
                 self.parse_mul_call();
                 continue;
             }
 
             if c == 'd' {
-                dbg!("cond");
                 self.parse_conditional();
                 continue;
             }
@@ -48,18 +37,12 @@ impl<'a> Parser<'a> {
         self.output.clone()
     }
 
-    fn next(&mut self) -> Option<char> {
-        let char = self.chars.nth(self.ptr);
-        self.ptr += 1;
-        char
-    }
-
     fn parse_conditional(&mut self) {
-        let Some('o') = self.next() else {
+        let Some('o') = self.chars.next() else {
             return;
         };
 
-        let Some(char) = self.next() else {
+        let Some(char) = self.chars.next() else {
             return;
         };
 
@@ -70,19 +53,18 @@ impl<'a> Parser<'a> {
 
         if char == 'n' {
             self.parse_dont_call();
-            return;
         }
     }
 
     fn parse_do_call(&mut self) {
-        if let Some(')') = self.next() {
+        if let Some(')') = self.chars.next() {
             self.output.push(Node::Do);
         }
     }
 
     fn parse_dont_call(&mut self) {
-        for c in ['o', 'n', '\'', 't', '(', ')'] {
-            if let Some(current_char) = self.next() {
+        for c in ['\'', 't', '(', ')'] {
+            if let Some(current_char) = self.chars.next() {
                 if current_char != c {
                     return;
                 }
@@ -92,10 +74,10 @@ impl<'a> Parser<'a> {
         self.output.push(Node::Dont);
     }
 
-    fn parse_number_while_not(&mut self, end: char) -> Option<i32> {
+    fn parse_number_until(&mut self, end: char) -> Option<i32> {
         let mut output = String::new();
 
-        while let Some(c) = self.next() {
+        for c in self.chars.by_ref() {
             if c == end {
                 if let Ok(value) = output.parse() {
                     return Some(value);
@@ -114,7 +96,7 @@ impl<'a> Parser<'a> {
 
     fn parse_mul_call(&mut self) {
         for c in ['u', 'l', '('] {
-            let Some(current_char) = self.next() else {
+            let Some(current_char) = self.chars.next() else {
                 return;
             };
 
@@ -123,14 +105,14 @@ impl<'a> Parser<'a> {
             }
         }
 
-        let Some(left) = self.parse_number_while_not(',') else {
+        let Some(left) = self.parse_number_until(',') else {
             return;
         };
 
-        let Some(right) = self.parse_number_while_not(')') else {
+        let Some(right) = self.parse_number_until(')') else {
             return;
         };
 
-        self.output.push(Node::Mul(Mul { left, right }))
+        self.output.push(Node::Mul(left, right))
     }
 }

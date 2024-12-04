@@ -1,14 +1,16 @@
-use crate::parser::Parser;
+use crate::parser::{Node, Parser};
 
 pub fn part_1(input: &str) -> i32 {
     let mut parser = Parser::new(input);
     let output = parser.parse();
 
-    dbg!(&output);
     let mut sum = 0;
-    for call in &output {
-        // let product = call.left * call.right;
-        // sum += product
+
+    for node in &output {
+        if let Node::Mul(left, right) = node {
+            let product = left * right;
+            sum += product
+        }
     }
 
     sum
@@ -28,8 +30,8 @@ mod tests {
 
     #[test]
     fn test() {
-        // let input = fs::read_to_string("./input.txt").unwrap();
-        // let output = part_1(&input);
-        // dbg!(output);
+        let input = fs::read_to_string("./input.txt").unwrap();
+        let output = part_1(&input);
+        dbg!(output);
     }
 }
