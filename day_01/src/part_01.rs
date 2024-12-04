@@ -1,16 +1,9 @@
 use std::iter::zip;
 
+use crate::helpers::parse_input;
+
 pub fn part_01(input: &str) -> i32 {
-    let lines = input.lines();
-
-    let mut left: Vec<i32> = Vec::new();
-    let mut right: Vec<i32> = Vec::new();
-
-    for line in lines {
-        let split: Vec<_> = line.split("   ").collect();
-        left.push(split[0].parse().unwrap());
-        right.push(split[1].parse().unwrap());
-    }
+    let (mut left, mut right) = parse_input(input);
 
     left.sort();
     right.sort();
