@@ -14,7 +14,6 @@ const DIRECTIONS: [Direction; 8] = [
 #[derive(Debug)]
 pub struct Finder<'a> {
     input: &'a str,
-    count: i32,
     row: i32,
     col: i32,
     col_size: i32,
@@ -24,34 +23,64 @@ impl<'a> Finder<'a> {
     pub fn new(input: &'a str) -> Self {
         Finder {
             input,
-            count: 0,
             row: 0,
             col: 0,
             col_size: input.find('\n').unwrap_or(0) as i32,
         }
     }
 
-    pub fn find(&mut self) -> i32 {
+    /// Find all instances of the word "XMAS" in the input.
+    pub fn find_xmas_count(&mut self) -> i32 {
+        self.reset();
+
+        let mut count = 0;
+
         for c in self.input.chars() {
             if c == '\n' {
-                self.row += 1;
-                self.col = 0;
+                self.increment_row();
                 continue;
             }
 
             for direction in DIRECTIONS.iter() {
-                if self.scan(direction) {
-                    self.count += 1;
+                if self.scan_for_xmas(direction) {
+                    count += 1;
                 }
             }
 
             self.col += 1;
         }
 
-        self.count
+        count
     }
 
-    fn scan(&self, direction: &Direction) -> bool {
+    pub fn find_mas_x_count(&mut self) -> i32 {
+        self.reset();
+
+        let mut count = 0;
+
+        for c in self.input.chars() {
+            if c == '\n' {
+                self.increment_row();
+                continue;
+            }
+
+            self.col += 1;
+        }
+
+        count
+    }
+
+    fn reset(&mut self) {
+        self.row = 0;
+        self.col = 0;
+    }
+
+    fn increment_row(&mut self) {
+        self.row += 1;
+        self.col = 0;
+    }
+
+    fn scan_for_xmas(&self, direction: &Direction) -> bool {
         for (i, char) in ['X', 'M', 'A', 'S'].iter().enumerate() {
             let x = self.col + (i as i32 * direction.0);
             let y = self.row + (i as i32 * direction.1);
@@ -83,67 +112,71 @@ impl<'a> Finder<'a> {
 mod tests {
     use super::*;
 
+    // find_xmas_count tests
+
     #[test]
-    fn finder_test_simple_up() {
+    fn find_xmas_count_simple_up() {
         let input = "S\nA\nM\nX\n";
         let mut finder = Finder::new(input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_up_right() {
+    fn find_xmas_count_simple_up_right() {
         let input = ["...S", "..A.", ".M..", "X..."].join("\n");
         let mut finder = Finder::new(&input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_right() {
+    fn find_xmas_count_simple_right() {
         let input = "XMAS\n";
         let mut finder = Finder::new(input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_down_right() {
+    fn find_xmas_count_simple_down_right() {
         let input = ["X...", ".M..", "..A.", "...S"].join("\n");
         let mut finder = Finder::new(&input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_down() {
+    fn find_xmas_count_simple_down() {
         let input = "X\nM\nA\nS\n";
         let mut finder = Finder::new(input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_down_left() {
+    fn find_xmas_count_simple_down_left() {
         let input = ["...X", "..M.", ".A..", "S..."].join("\n");
         let mut finder = Finder::new(&input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_left() {
+    fn find_xmas_count_simple_left() {
         let input = "SAMX\n";
         let mut finder = Finder::new(input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
 
     #[test]
-    fn finder_test_simple_up_left() {
+    fn find_xmas_count_simple_up_left() {
         let input = ["S...", ".A..", "..M.", "...X"].join("\n");
         let mut finder = Finder::new(&input);
-        let output = finder.find();
+        let output = finder.find_xmas_count();
         assert_eq!(output, 1);
     }
+
+    // find_mas_x_count tests
 }

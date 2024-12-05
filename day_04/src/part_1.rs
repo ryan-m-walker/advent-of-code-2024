@@ -1,10 +1,8 @@
 use crate::finder::Finder;
 
-type Direction = (i32, i32);
-
 pub fn part_1(input: &str) -> i32 {
     let mut finder = Finder::new(input);
-    finder.find()
+    finder.find_xmas_count()
 }
 
 #[cfg(test)]
