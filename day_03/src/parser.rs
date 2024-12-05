@@ -74,7 +74,7 @@ impl<'a> Parser<'a> {
         self.output.push(Node::Dont);
     }
 
-    fn parse_number_until(&mut self, end: char) -> Option<i32> {
+    fn parse_number_while_not(&mut self, end: char) -> Option<i32> {
         let mut output = String::new();
 
         for c in self.chars.by_ref() {
@@ -105,11 +105,11 @@ impl<'a> Parser<'a> {
             }
         }
 
-        let Some(left) = self.parse_number_until(',') else {
+        let Some(left) = self.parse_number_while_not(',') else {
             return;
         };
 
-        let Some(right) = self.parse_number_until(')') else {
+        let Some(right) = self.parse_number_while_not(')') else {
             return;
         };
 
