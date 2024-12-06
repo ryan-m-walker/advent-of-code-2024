@@ -33,13 +33,13 @@ pub fn parse_input(input: &str) -> (OrderingMap, Updates) {
 }
 
 pub fn is_correct_order(order_map: &OrderingMap, update: &Vec<i32>) -> bool {
-    let all: HashSet<&i32, RandomState> = HashSet::from_iter(update.iter());
+    let all: HashSet<i32, RandomState> = HashSet::from_iter(update.iter().copied());
     let mut seen = HashSet::new();
 
     for page in update {
-        seen.insert(page);
+        seen.insert(*page);
 
-        if !satisfies_requirements(page, &all, &seen, order_map) {
+        if !satisfies_requirements(*page, &all, &seen, order_map) {
             return false;
         }
     }
@@ -48,12 +48,12 @@ pub fn is_correct_order(order_map: &OrderingMap, update: &Vec<i32>) -> bool {
 }
 
 pub fn satisfies_requirements(
-    page: &i32,
-    all: &HashSet<&i32>,
-    seen: &HashSet<&i32>,
+    page: i32,
+    all: &HashSet<i32>,
+    seen: &HashSet<i32>,
     order_map: &OrderingMap,
 ) -> bool {
-    let Some(requirments) = order_map.get(page) else {
+    let Some(requirments) = order_map.get(&page) else {
         return true;
     };
 
