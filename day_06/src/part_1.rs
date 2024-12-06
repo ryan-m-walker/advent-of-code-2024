@@ -3,7 +3,7 @@ use crate::{guard::Guard, map::Map};
 pub fn part_1(input: &str) -> i32 {
     let map = Map::new(input);
     let mut guard = Guard::new(&map);
-    guard.patrol()
+    guard.patrol().len() as i32
 }
 
 #[cfg(test)]

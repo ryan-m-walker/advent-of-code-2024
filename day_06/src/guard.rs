@@ -14,7 +14,7 @@ pub struct Guard<'a> {
     x: i32,
     y: i32,
     direction: Direction,
-    visited: HashSet<String>,
+    visited: HashSet<(i32, i32)>,
     map: &'a Map,
     print_map: bool,
 }
@@ -36,12 +36,12 @@ impl<'a> Guard<'a> {
         self
     }
 
-    pub fn patrol(&mut self) -> i32 {
+    pub fn patrol(&mut self) -> HashSet<(i32, i32)> {
         self.reset();
         self.print_map();
 
         loop {
-            self.visited.insert(pos_to_string((self.x, self.y)));
+            self.visited.insert((self.x, self.y));
 
             let next_space = self.get_next_space();
             let next_space_type = self.map.get_position(next_space.0, next_space.1);
@@ -63,7 +63,7 @@ impl<'a> Guard<'a> {
 
         self.print_map();
 
-        self.visited.len() as i32
+        self.visited.clone()
     }
 
     fn reset(&mut self) {
@@ -103,8 +103,7 @@ impl<'a> Guard<'a> {
                 if x == self.x && y == self.y {
                     print!("{}", self.get_guard_char());
                 } else {
-                    let pos = pos_to_string((x, y));
-                    if self.visited.contains(&pos) {
+                    if self.visited.contains(&(x, y)) {
                         print!("o");
                     } else {
                         match self.map.get_position(x, y) {
@@ -119,7 +118,6 @@ impl<'a> Guard<'a> {
         }
 
         thread::sleep(time::Duration::from_millis(400));
-        self.clear_screen();
     }
 
     fn get_guard_char(&self) -> char {
@@ -130,8 +128,4 @@ impl<'a> Guard<'a> {
             Direction::Left => '<',
         }
     }
-}
-
-fn pos_to_string(pos: (i32, i32)) -> String {
-    format!("{},{}", pos.0, pos.1)
 }
