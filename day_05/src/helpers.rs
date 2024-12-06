@@ -39,18 +39,31 @@ pub fn is_correct_order(order_map: &OrderingMap, update: &Vec<i32>) -> bool {
     for page in update {
         seen.insert(page);
 
-        let Some(requirments) = order_map.get(page) else {
+        if !satisfies_requirements(page, &all, &seen, order_map) {
+            return false;
+        }
+    }
+
+    true
+}
+
+pub fn satisfies_requirements(
+    page: &i32,
+    all: &HashSet<&i32>,
+    seen: &HashSet<&i32>,
+    order_map: &OrderingMap,
+) -> bool {
+    let Some(requirments) = order_map.get(page) else {
+        return true;
+    };
+
+    for requirment in requirments {
+        if !all.contains(requirment) {
             continue;
-        };
+        }
 
-        for requirment in requirments {
-            if !all.contains(requirment) {
-                continue;
-            }
-
-            if !seen.contains(requirment) {
-                return false;
-            }
+        if !seen.contains(requirment) {
+            return false;
         }
     }
 

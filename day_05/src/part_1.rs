@@ -27,6 +27,7 @@ mod tests {
         let output = part_1(&input);
         assert_eq!(output, 143);
     }
+
     #[test]
     fn part_1_test() {
         let input = fs::read_to_string("./input.txt").unwrap();
