@@ -7,11 +7,11 @@ pub fn part_1(input: &str) -> i32 {
 
     let mut valid = vec![];
 
-    'updates: for update in updates {
+    'main: for update in updates {
         let all: HashSet<&i32, RandomState> = HashSet::from_iter(update.iter());
         let mut seen = HashSet::new();
 
-        'page: for page in &update {
+        for page in &update {
             seen.insert(page);
 
             let Some(requirments) = order_map.get(page) else {
@@ -24,7 +24,7 @@ pub fn part_1(input: &str) -> i32 {
                 }
 
                 if !seen.contains(requirment) {
-                    continue 'updates;
+                    continue 'main;
                 }
             }
         }
