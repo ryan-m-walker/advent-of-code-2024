@@ -26,14 +26,14 @@ mod tests {
     use std::fs;
 
     #[test]
-    fn part_1_example_test() {
+    fn part_2_example_test() {
         let input = fs::read_to_string("./example_input.txt").unwrap();
         let output = part_2(&input);
         assert_eq!(output, 6);
     }
 
     #[test]
-    fn part_1_test() {
+    fn part_2_test() {
         let input = fs::read_to_string("./input.txt").unwrap();
         let output = part_2(&input);
         dbg!(output);
