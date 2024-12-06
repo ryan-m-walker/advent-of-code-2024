@@ -1,41 +1,16 @@
-use std::{collections::HashSet, hash::RandomState};
-
-use crate::helpers::parse_input;
+use crate::helpers::{is_correct_order, parse_input};
 
 pub fn part_1(input: &str) -> i32 {
     let (order_map, updates) = parse_input(input);
 
     let mut valid = vec![];
 
-    'main: for update in updates {
-        let all: HashSet<&i32, RandomState> = HashSet::from_iter(update.iter());
-        let mut seen = HashSet::new();
-
-        for page in &update {
-            seen.insert(page);
-
-            let Some(requirments) = order_map.get(page) else {
-                continue;
-            };
-
-            for requirment in requirments {
-                if !all.contains(requirment) {
-                    continue;
-                }
-
-                if !seen.contains(requirment) {
-                    continue 'main;
-                }
-            }
+    for update in updates {
+        if is_correct_order(&order_map, &update) {
+            let middle = update.len() / 2;
+            let item = update[middle];
+            valid.push(item);
         }
-
-        let middle = seen.len() / 2;
-
-        let Some(item) = update.get(middle) else {
-            continue;
-        };
-
-        valid.push(*item);
     }
 
     valid.iter().sum::<i32>()

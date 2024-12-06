@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::RandomState,
+};
 
 type OrderingMap = HashMap<i32, HashSet<i32>>;
 type Updates = Vec<Vec<i32>>;
@@ -15,11 +18,7 @@ pub fn parse_input(input: &str) -> (OrderingMap, Updates) {
         let first: i32 = parts[0].parse().unwrap();
         let second: i32 = parts[1].parse().unwrap();
 
-        if !ordering_map.contains_key(&second) {
-            ordering_map.insert(second, HashSet::new());
-        }
-
-        let current_set = ordering_map.get_mut(&second).unwrap();
+        let current_set = ordering_map.entry(second).or_insert_with(HashSet::new);
         current_set.insert(first);
     }
 
@@ -31,6 +30,31 @@ pub fn parse_input(input: &str) -> (OrderingMap, Updates) {
     }
 
     (ordering_map, updates)
+}
+
+pub fn is_correct_order(order_map: &OrderingMap, update: &Vec<i32>) -> bool {
+    let all: HashSet<&i32, RandomState> = HashSet::from_iter(update.iter());
+    let mut seen = HashSet::new();
+
+    for page in update {
+        seen.insert(page);
+
+        let Some(requirments) = order_map.get(page) else {
+            continue;
+        };
+
+        for requirment in requirments {
+            if !all.contains(requirment) {
+                continue;
+            }
+
+            if !seen.contains(requirment) {
+                return false;
+            }
+        }
+    }
+
+    true
 }
 
 #[cfg(test)]
