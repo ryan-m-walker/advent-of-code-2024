@@ -11,12 +11,22 @@ const DIRECTIONS: [Direction; 8] = [
     (-1, -1), // up-left
 ];
 
+type MasMapping = [(i32, i32); 3];
+
+const MAS_MAPPINGS: [MasMapping; 4] = [
+    [(-1, -1), (0, 0), (1, 1)],
+    [(1, -1), (0, 0), (-1, 1)],
+    [(1, 1), (0, 0), (-1, -1)],
+    [(-1, 1), (0, 0), (1, -1)],
+];
+
 #[derive(Debug)]
 pub struct Finder<'a> {
     input: &'a str,
     row: i32,
     col: i32,
-    col_size: i32,
+    col_count: i32,
+    row_count: i32,
 }
 
 impl<'a> Finder<'a> {
@@ -25,7 +35,8 @@ impl<'a> Finder<'a> {
             input,
             row: 0,
             col: 0,
-            col_size: input.find('\n').unwrap_or(0) as i32,
+            col_count: input.find('\n').unwrap_or(0) as i32,
+            row_count: input.lines().count() as i32,
         }
     }
 
@@ -42,7 +53,7 @@ impl<'a> Finder<'a> {
             }
 
             for direction in DIRECTIONS.iter() {
-                if self.scan_for_xmas(direction) {
+                if self.scan_for_word(direction, &['X', 'M', 'A', 'S']) {
                     count += 1;
                 }
             }
@@ -64,6 +75,10 @@ impl<'a> Finder<'a> {
                 continue;
             }
 
+            if self.is_window_in_bounds() && self.scan_for_mas() {
+                count += 1;
+            }
+
             self.col += 1;
         }
 
@@ -80,8 +95,41 @@ impl<'a> Finder<'a> {
         self.col = 0;
     }
 
-    fn scan_for_xmas(&self, direction: &Direction) -> bool {
-        for (i, char) in ['X', 'M', 'A', 'S'].iter().enumerate() {
+    fn is_window_in_bounds(&self) -> bool {
+        let is_in_left_bound = self.col > 0;
+        let is_in_right_bound = self.col + 1 < self.col_count;
+        let is_in_top_bound = self.row > 0;
+        let is_in_bottom_bound = self.row + 1 < self.row_count;
+
+        is_in_left_bound && is_in_right_bound && is_in_top_bound && is_in_bottom_bound
+    }
+
+    fn scan_for_mas(&self) -> bool {
+        let mut count = 0;
+
+        'outer: for mapping in MAS_MAPPINGS.iter() {
+            for (index, char) in ['M', 'A', 'S'].iter().enumerate() {
+                let (x_offset, y_offset) = mapping[index];
+                let x = self.col + x_offset;
+                let y = self.row + y_offset;
+
+                let Some(target) = self.get_char(x, y) else {
+                    continue 'outer;
+                };
+
+                if target != *char {
+                    continue 'outer;
+                }
+            }
+
+            count += 1;
+        }
+
+        count == 2
+    }
+
+    fn scan_for_word(&self, direction: &Direction, word: &[char]) -> bool {
+        for (i, char) in word.iter().enumerate() {
             let x = self.col + (i as i32 * direction.0);
             let y = self.row + (i as i32 * direction.1);
 
@@ -98,7 +146,7 @@ impl<'a> Finder<'a> {
     }
 
     fn get_char(&self, x: i32, y: i32) -> Option<char> {
-        let row_offset = y * (self.col_size + 1);
+        let row_offset = y * (self.col_count + 1);
         let index_start = (row_offset + x) as usize;
         let index_end = (row_offset + x + 1) as usize;
 
@@ -179,4 +227,12 @@ mod tests {
     }
 
     // find_mas_x_count tests
+
+    #[test]
+    fn find_mas_x_count_simple_up_right_down_left() {
+        let input = ["M.M", ".A.", "S.S"].join("\n");
+        let mut finder = Finder::new(&input);
+        let output = finder.find_mas_x_count();
+        assert_eq!(output, 1);
+    }
 }
