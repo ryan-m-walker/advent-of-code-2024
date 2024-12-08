@@ -133,15 +133,4 @@ impl Map {
         let index = (y * self.width + x) as usize;
         self.data.get(index)
     }
-
-    fn get_antinode(&self, x: i32, y: i32, offset: i32) -> Option<&char> {
-        let dx = x + offset;
-        let dy = y + offset;
-
-        if dx < 0 || dy < 0 || dx >= self.width || dy >= self.height {
-            return None;
-        }
-
-        self.get(dx, dy)
-    }
 }
