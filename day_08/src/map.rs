@@ -30,15 +30,13 @@ impl Map {
                 continue;
             }
 
-            x += 1;
-            data.push(c);
-
-            if c == '.' {
-                continue;
+            if c != '.' {
+                let freq = frequencies.entry(c.to_string()).or_insert(Vec::new());
+                freq.push((x, y));
             }
 
-            let freq = frequencies.entry(c.to_string()).or_insert(Vec::new());
-            freq.push((x, y));
+            x += 1;
+            data.push(c);
         }
 
         Map {
@@ -61,7 +59,7 @@ impl Map {
                     let dx = other.0 - antenna.0;
                     let dy = other.1 - antenna.1;
 
-                    let node_x = antenna.0 + dx * 2 - 1;
+                    let node_x = antenna.0 + dx * 2;
                     let node_y = antenna.1 + dy * 2;
 
                     let pos = self.get(node_x, node_y);
