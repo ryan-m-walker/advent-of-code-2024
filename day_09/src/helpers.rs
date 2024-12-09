@@ -65,8 +65,6 @@ pub fn print_with_highlights(blocks: &[Block], head_hl: usize, tail_hl: usize) {
 }
 
 pub fn format_disk(blocks: &mut [Block]) {
-    println!();
-
     let mut head_ptr = 0;
     let mut tail_ptr = blocks.len() - 1;
 
