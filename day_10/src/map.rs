@@ -96,6 +96,16 @@ impl HikingMap {
         count
     }
 
+    pub fn find_all_unique_trailheads(&self) -> i32 {
+        let mut count = 0;
+
+        for start in &self.starting_positions {
+            count += self.find_unique_trailheads(0, start.0, start.1);
+        }
+
+        count
+    }
+
     fn find_trailheads(
         &self,
         height: i32,
@@ -122,14 +132,32 @@ impl HikingMap {
 
         count
     }
+
+    fn find_unique_trailheads(&self, height: i32, x: i32, y: i32) -> i32 {
+        let next_positions = self.get_next_moves(height, x, y);
+
+        if height == 9 && self.get(x, y).is_some() {
+            return 1;
+        }
+
+        let mut count = 0;
+
+        for next in next_positions {
+            count += self.find_unique_trailheads(height + 1, next.0, next.1);
+        }
+
+        count
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    // find_all_trailheads tests
+
     #[test]
-    fn hiking_map_test_input_1() {
+    fn find_all_trailheads_1() {
         let input = [
             "...0...", "...1...", "...2...", "6543456", "7.....7", "8.....8", "9.....9",
         ]
@@ -140,7 +168,7 @@ mod tests {
     }
 
     #[test]
-    fn hiking_map_test_input_2() {
+    fn find_all_trailheads_2() {
         let input = [
             "..90..9", "...1.98", "...2..7", "6543456", "765.987", "876....", "987....",
         ]
@@ -151,7 +179,7 @@ mod tests {
     }
 
     #[test]
-    fn hiking_map_test_input_3() {
+    fn find_all_trailheads_3() {
         let input = [
             "10..9..", "2...8..", "3...7..", "4567654", "...8..3", "...9..2", ".....01",
         ]
@@ -159,5 +187,37 @@ mod tests {
         let map = HikingMap::new(&input);
         let output = map.find_all_trailheads();
         assert_eq!(output, 3);
+    }
+
+    // find_all_unique_trailheads tests
+
+    #[test]
+    fn find_all_unique_trailheads_1() {
+        let input = [
+            ".....0.", "..4321.", "..5..2.", "..6543.", "..7..4.", "..8765.", "..9....",
+        ]
+        .join("\n");
+        let map = HikingMap::new(&input);
+        let output = map.find_all_unique_trailheads();
+        assert_eq!(output, 3);
+    }
+
+    #[test]
+    fn find_all_unique_trailheads_2() {
+        let input = [
+            "..90..9", "...1.98", "...2..7", "6543456", "765.987", "876....", "987....",
+        ]
+        .join("\n");
+        let map = HikingMap::new(&input);
+        let output = map.find_all_unique_trailheads();
+        assert_eq!(output, 13);
+    }
+
+    #[test]
+    fn find_all_unique_trailheads_3() {
+        let input = ["012345", "123456", "234567", "345678", "4.6789", "56789."].join("\n");
+        let map = HikingMap::new(&input);
+        let output = map.find_all_unique_trailheads();
+        assert_eq!(output, 227);
     }
 }
