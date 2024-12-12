@@ -4,104 +4,84 @@ use crate::helpers::{parse_input, rule_1, rule_2};
 
 pub struct Stones {
     stones: Vec<String>,
-    visits: HashMap<String, String>,
+    cache_hits: i64,
+    cache: HashMap<String, i64>,
 }
 
 impl Stones {
     pub fn new(input: &str) -> Self {
         Self {
             stones: parse_input(input),
-            visits: HashMap::new(),
+            cache: HashMap::new(),
+            cache_hits: 0,
         }
     }
 
     pub fn blink_n_times(&mut self, n: i32) -> i64 {
-        let mut output = String::new();
+        let mut output = 0;
 
-        for stone in self.stones.clone() {
-            dbg!(&stone);
-
-            if !output.is_empty() {
-                output.push(' ');
-            }
-
-            output.push_str(&self.blink_stone_n_times(&stone, n));
+        for s in self.stones.clone() {
+            output += self.blink(&s, n);
         }
-
-        output.split(' ').count() as i64
-    }
-
-    fn blink_stone_n_times(&mut self, stone: &str, n: i32) -> String {
-        let mut next = stone.to_string();
-
-        for i in 0..n {
-            if self.visits.contains_key(&next) {
-                return self.visits.get(stone).unwrap().to_string();
-            }
-
-            dbg!(i);
-
-            next = self.blink_stone(&next);
-            self.visits.insert(stone.to_string(), next.clone());
-        }
-
-        next
-    }
-
-    fn blink(&self, stone: &str, n: i32) {}
-
-    fn blink_stone(&mut self, stone: &str) -> String {
-        if self.visits.contains_key(stone) {
-            return self.visits.get(stone).unwrap().to_string();
-        }
-
-        // dbg!(self.visits.len());
-
-        let mut output = Vec::new();
-        let stones = parse_input(stone);
-
-        for stone in stones {
-            if self.visits.contains_key(&stone) {
-                output.push(self.visits.get(&stone).unwrap().to_string());
-                continue;
-            }
-
-            if rule_1(&stone) {
-                output.push(String::from("1"));
-                self.visits.insert(stone.to_string(), String::from("1"));
-                continue;
-            }
-
-            if rule_2(&stone) {
-                let halfway = stone.len() / 2;
-                let left = &stone[..halfway];
-                let right = &stone[halfway..];
-
-                let left_parsed: i64 = left.parse().unwrap();
-                let right_parsed: i64 = right.parse().unwrap();
-
-                output.push(left_parsed.to_string());
-                output.push(right_parsed.to_string());
-
-                self.visits.insert(
-                    stone.to_string(),
-                    format!("{} {}", left_parsed, right_parsed),
-                );
-                continue;
-            }
-
-            let parsed: i64 = stone.parse().unwrap();
-            let multiplied = parsed * 2024;
-            output.push(multiplied.to_string());
-            self.visits
-                .insert(stone.to_string(), multiplied.to_string());
-        }
-
-        let output = output.join(" ");
-
-        self.visits.insert(stone.to_string(), output.clone());
 
         output
+    }
+
+    fn get_cached_value(&mut self, cache_key: &str) -> Option<i64> {
+        let value = self.cache.get(cache_key).copied();
+
+        if value.is_some() {
+            self.cache_hits += 1;
+        }
+
+        value
+    }
+
+    fn get_cache_key(&self, stone: &str, n: i32) -> String {
+        format!("{}-{}", stone, n)
+    }
+
+    fn blink(&mut self, stone: &str, n: i32) -> i64 {
+        if n <= 0 {
+            let cache_key = self.get_cache_key(stone, n);
+            self.cache.insert(cache_key, 1);
+            return 1;
+        }
+
+        if rule_1(stone) {
+            return self.blink("1", n - 1);
+        }
+
+        if rule_2(stone) {
+            let halfway = stone.len() / 2;
+            let left = &stone[..halfway];
+            let right = &stone[halfway..];
+
+            let left_parsed: i64 = left.parse().unwrap();
+            let right_parsed: i64 = right.parse().unwrap();
+
+            let cache_key_1 = self.get_cache_key(&left_parsed.to_string(), n - 1);
+            let output_1 = self.blink(&left_parsed.to_string(), n - 1);
+            self.cache.insert(cache_key_1, output_1);
+
+            let cache_key_2 = self.get_cache_key(&right_parsed.to_string(), n - 1);
+            let output_2 = self.blink(&right_parsed.to_string(), n - 1);
+            self.cache.insert(cache_key_2, output_2);
+
+            return output_1 + output_2;
+        }
+
+        let parsed: i64 = stone.parse().unwrap();
+        let multiplied = parsed * 2024;
+        let new_stone = multiplied.to_string();
+
+        let cache_key = self.get_cache_key(stone, n);
+
+        if let Some(v) = self.get_cached_value(&cache_key) {
+            return v;
+        }
+
+        self.blink(&new_stone, n - 1)
     }
 }
 
@@ -109,27 +89,11 @@ impl Stones {
 mod tests {
     use super::*;
 
-    // #[test]
-    // fn test_name() {
-    //     let input = "125 17";
-    //     let mut stones = Stones::new(input);
-    //     let output = stones.blink_n_times(6);
-    //     assert_eq!(output, 22,);
-    // }
-    //
-    // #[test]
-    // fn test_name_2() {
-    //     let input = "125 17";
-    //     let mut stones = Stones::new(input);
-    //     let output = stones.blink_n_times(25);
-    //     assert_eq!(output, 55312);
-    // }
-
     #[test]
-    fn test_name_2() {
-        let input = "125";
+    fn test_1() {
+        let input = "125 17";
         let mut stones = Stones::new(input);
-        let output = stones.blink_n_times(75);
-        dbg!(output);
+        let output = stones.blink_n_times(6);
+        assert_eq!(output, 22);
     }
 }
