@@ -74,7 +74,6 @@ impl Region {
             let mut current = vec![];
 
             for (i, fence) in values_clone.iter().enumerate() {
-                // dbg!(&current);
                 current.push((key.clone(), *fence));
 
                 let Some(next) = values_clone.get(i + 1) else {
