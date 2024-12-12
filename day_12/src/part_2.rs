@@ -7,7 +7,7 @@ pub fn part_2(input: &str) -> i32 {
     let mut output = 0;
 
     for region in regions {
-        output += region.get_fence_edges().len() as i32 * region.area;
+        output += region.get_fence_edges().len() as i32 * region.area();
     }
 
     output

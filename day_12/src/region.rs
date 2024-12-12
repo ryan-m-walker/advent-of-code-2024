@@ -11,7 +11,6 @@ pub enum Dir {
 #[derive(Debug, Clone)]
 pub struct Region {
     pub plant: char,
-    pub area: i32,
     pub parimeter: i32,
     pub fences: HashMap<String, Vec<i32>>,
     pub plots: HashSet<(i32, i32)>,
@@ -22,7 +21,6 @@ impl Region {
         Self {
             plant,
             plots: HashSet::new(),
-            area: 0,
             parimeter: 0,
             fences: HashMap::new(),
         }
@@ -34,11 +32,14 @@ impl Region {
         }
 
         self.plots.insert((x, y));
-        self.area += 1;
     }
 
     pub fn has(&self, x: i32, y: i32) -> bool {
         self.plots.contains(&(x, y))
+    }
+
+    pub fn area(&self) -> i32 {
+        self.plots.len() as i32
     }
 
     pub fn add_fence(&mut self, dir: Dir, x: i32, y: i32) {
