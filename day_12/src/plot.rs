@@ -1,3 +1,5 @@
+use crate::region::Dir;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Plot {
     pub x: i32,
@@ -10,11 +12,11 @@ impl Plot {
         Self { x, y, plant }
     }
 
-    pub fn neighbours(&self) -> Vec<(i32, i32)> {
-        let up = (self.x, self.y - 1);
-        let right = (self.x + 1, self.y);
-        let down = (self.x, self.y + 1);
-        let left = (self.x - 1, self.y);
+    pub fn neighbours(&self) -> Vec<(i32, i32, Dir)> {
+        let up = (self.x, self.y - 1, Dir::Up);
+        let right = (self.x + 1, self.y, Dir::Right);
+        let down = (self.x, self.y + 1, Dir::Down);
+        let left = (self.x - 1, self.y, Dir::Left);
 
         vec![up, right, down, left]
     }

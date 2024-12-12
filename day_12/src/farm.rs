@@ -72,14 +72,14 @@ impl Farm {
         visited.insert((plot.x, plot.y));
         region.add(plot.x, plot.y);
 
-        for (x, y) in plot.neighbours() {
+        for (x, y, dir) in plot.neighbours() {
             let Some(neighbor) = self.get(x, y) else {
-                region.increment_parimeter();
+                region.add_fence(dir, x, y);
                 continue;
             };
 
             if neighbor.plant != region.plant {
-                region.increment_parimeter();
+                region.add_fence(dir, x, y);
                 continue;
             }
 

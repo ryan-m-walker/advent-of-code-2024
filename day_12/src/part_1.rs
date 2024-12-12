@@ -1,6 +1,6 @@
 use crate::farm::Farm;
 
-pub fn part_1(input: &str) -> i64 {
+pub fn part_1(input: &str) -> i32 {
     let farm = Farm::new(input);
     let regions = farm.get_regions();
 
