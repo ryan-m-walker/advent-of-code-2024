@@ -48,8 +48,8 @@ impl Robots {
 
     pub fn maybe_tree(&self) -> bool {
         for quad in self.quads().iter() {
-            let three_quarters = self.robots.len() as i32 / 2;
-            if quad > &three_quarters {
+            let half = self.robots.len() as i32 / 2;
+            if *quad > half {
                 return true;
             }
         }
