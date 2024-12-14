@@ -1,30 +1,12 @@
-use crate::robot::{Quad, Robot};
+use crate::{
+    robot::{Quad, Robot},
+    robots::Robots,
+};
 
 pub fn part_1(input: &str, count: i32, dimensions: (i32, i32)) -> i32 {
-    let mut tl = 0;
-    let mut tr = 0;
-    let mut bl = 0;
-    let mut br = 0;
-
-    let robots: Vec<Robot> = input
-        .lines()
-        .map(|line| Robot::new(line, dimensions))
-        .collect();
-
-    for mut robot in robots {
-        for _ in 0..count {
-            robot.step();
-        }
-
-        match robot.quad() {
-            Some(Quad::TopLeft) => tl += 1,
-            Some(Quad::TopRight) => tr += 1,
-            Some(Quad::BottomLeft) => bl += 1,
-            Some(Quad::BottomRight) => br += 1,
-            None => {}
-        }
-    }
-
+    let mut robots = Robots::new(input, dimensions);
+    robots.step_n_times(count);
+    let [tl, tr, bl, br] = robots.quads();
     tl * tr * bl * br
 }
 
