@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::helpers::parse_input;
 
 pub fn part_1(input: &str) -> f64 {
-    let machines = parse_input(input);
+    let machines = parse_input(input, 0.0);
 
     let mut computed_found = HashSet::new();
     let mut computed_total_cost = 0.0;
