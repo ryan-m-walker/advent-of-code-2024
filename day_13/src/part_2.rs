@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::helpers::parse_input;
 
-pub fn part_1(input: &str) -> f64 {
+pub fn part_2(input: &str) -> f64 {
     let machines = parse_input(input);
 
     let mut computed_found = HashSet::new();
@@ -26,16 +26,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn part_1_example_input() {
+    fn part_2_example_input() {
         let input = fs::read_to_string("./example_input.txt").unwrap();
-        let output = part_1(&input);
+        let output = part_2(&input);
         assert_eq!(output, 480.0);
     }
 
     #[test]
-    fn part_1_input() {
+    fn part_2_input() {
         let input = fs::read_to_string("./input.txt").unwrap();
-        let output = part_1(&input);
+        let output = part_2(&input);
         assert_eq!(output, 31761.0);
     }
 }
