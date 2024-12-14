@@ -73,26 +73,6 @@ impl Robot {
 
         None
     }
-
-    pub fn print(&self) {
-        let horizontal_middle = self.dimensions.0 / 2;
-        let vertical_middle = self.dimensions.1 / 2;
-
-        for y in 0..self.dimensions.1 {
-            for x in 0..self.dimensions.0 {
-                if self.pos == (x, y) {
-                    print!("#");
-                } else if x == horizontal_middle || y == vertical_middle {
-                    print!(" ");
-                } else {
-                    print!(".");
-                }
-            }
-            println!();
-        }
-
-        println!();
-    }
 }
 
 #[cfg(test)]
@@ -129,7 +109,6 @@ mod tests {
 
         for (x, y, quad) in expected.iter() {
             robot.step();
-            robot.print();
             assert_eq!(robot.pos, (*x, *y));
             assert_eq!(robot.quad(), *quad);
         }
