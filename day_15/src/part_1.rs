@@ -1,9 +1,8 @@
 use crate::warehouse::Warehouse;
 
 pub fn part_1(input: &str) -> i32 {
-    let mut warehouse = Warehouse::new(input);
+    let mut warehouse = Warehouse::new(input).with_print(false);
     warehouse.run();
-    warehouse.print();
     warehouse.get_gps_cooridnate_sum()
 }
 

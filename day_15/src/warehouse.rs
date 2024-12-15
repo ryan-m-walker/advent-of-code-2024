@@ -1,13 +1,9 @@
 use colored::Colorize;
 use std::collections::HashMap;
+use std::thread;
+use std::time;
 
-#[derive(Debug, Copy, Clone)]
-pub enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
-}
+use crate::helpers::Direction;
 
 #[derive(Debug, PartialEq)]
 pub enum Entity {
@@ -103,11 +99,13 @@ impl Warehouse {
             if self.should_print {
                 println!("{}", format!("Step {}:", i + 1).italic());
                 self.print();
+                thread::sleep(time::Duration::from_millis(300));
             }
         }
     }
 
     pub fn print(&self) {
+        print!("\x1B[2J\x1B[1;1H");
         for y in 0..self.height {
             for x in 0..self.width {
                 if self.robot == (x, y) {
